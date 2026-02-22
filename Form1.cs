@@ -150,6 +150,12 @@ namespace lab1
             step = step % EnglishAlphabet.Length;
             if (step == 0) step = 1;
 
+
+            if (GCD(step, EnglishAlphabet.Length) != 1)
+            {
+                throw new ArgumentException("Ключ должен быть взаимно простым с длиной алфавита (26)!");
+            }
+
             StringBuilder result = new StringBuilder();
             string upperInput = input.ToUpper();
 
@@ -161,12 +167,13 @@ namespace lab1
                 {
                     if (encrypt)
                     {
-                        int newIndex = (index + step) % EnglishAlphabet.Length;
+                        int newIndex = (index * step) % EnglishAlphabet.Length;
                         result.Append(EnglishAlphabet[newIndex]);
                     }
                     else
                     {
-                        int newIndex = (index - step + EnglishAlphabet.Length) % EnglishAlphabet.Length;
+                        int inverse = ModInverse(step, EnglishAlphabet.Length);
+                        int newIndex = (index * inverse) % EnglishAlphabet.Length;
                         result.Append(EnglishAlphabet[newIndex]);
                     }
                 }
@@ -177,6 +184,28 @@ namespace lab1
             }
 
             return result.ToString();
+        }
+
+        private int GCD(int a, int b)
+        {
+            while (b != 0)
+            {
+                int temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+
+        private int ModInverse(int a, int m)
+        {
+            a = a % m;
+            for (int x = 1; x < m; x++)
+            {
+                if ((a * x) % m == 1)
+                    return x;
+            }
+            return 1;
         }
 
         private string ProcessVigenere(string input, string key, bool encrypt)
